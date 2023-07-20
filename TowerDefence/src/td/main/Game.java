@@ -9,12 +9,11 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 import td.GameObjects.Handler;
 import td.GameObjects.Map;
 import td.GameObjects.TowerCursor;
-import td.GameObjects.towers.SmallTower;
+import td.GameObjects.towers.Tower;
 import td.GameObjects.towers.TowerHandler;
 
 import javax.imageio.ImageIO;
@@ -37,29 +36,24 @@ public class Game extends JPanel implements Runnable,KeyListener,MouseListener{
 	TowerCursor towercursor;
 	Handler handler;
 	TowerHandler towerHandler;
-	
-	boolean[][]map_empty;
+
+	boolean[][]map_fill;
 	public Game() {
-		
 		try {
 			img = ImageIO.read(new File("res/Tank.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	
+		Map map = new Map(MapRow,MapCol);
+		
 		running = true;
 		towercursor = new TowerCursor();
 		handler = new Handler();
 		towerHandler = new TowerHandler();
+		handler.addObject(map);
 		
-		handler.addObject(new Map(MapRow,MapCol));
-		map_empty = new boolean[MapRow][MapCol];
-		
-		for (int r = 0; r < MapRow; r++) {
-			for (int c = 0; c < MapCol; c++) {
-				map_empty[r][c] = false;
-			}
-		}
+		map_fill = map.mapFill();
 //		Panel ile ilgili basit ayarlar
 		setBounds(0,0,PanelWidth,PanelHeight);
 		requestFocus(); 
@@ -144,9 +138,11 @@ public class Game extends JPanel implements Runnable,KeyListener,MouseListener{
 		
 	}
 
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		addTower();
+		addTower(1056,0,"res/Tank.png",new Tower(towercursor.getX(),towercursor.getY(),Game.TileSize,Game.TileSize,1,"res/Tank.png"));
+
 	}
 
 	@Override
@@ -173,10 +169,10 @@ public class Game extends JPanel implements Runnable,KeyListener,MouseListener{
 	
 	
 	//Kule eklerken konsolun çizdiði bulanýk görseli silip yerine Tower objesi ekliyor.
-	void addTower() {
+	private void addTower(int x,int y,String iconPath,Tower tower) {
 		if(!towercursor.getVisible()) {
-			if(towercursor.getX() == 1056 && towercursor.getY()==0) {
-				towercursor.setImage("res/Tank.png");
+			if(towercursor.getX() == x && towercursor.getY() == y) {
+				towercursor.setImage(iconPath);
 				towercursor.setVisible(true);
 			}
 		}else {
@@ -185,15 +181,14 @@ public class Game extends JPanel implements Runnable,KeyListener,MouseListener{
 			if(towercursor.getX() > (MapRow-1)*Game.TileSize || towercursor.getY() > (MapCol-1)*Game.TileSize) {
 				JOptionPane.showMessageDialog(this, "Hocam ora yassssssssssak");	
 			}
-			else if((map_empty[towercursor.getX()/Game.TileSize][towercursor.getY()/Game.TileSize] == true) ) {	
+			else if(map_fill[towercursor.getX()/Game.TileSize][towercursor.getY()/Game.TileSize]) {	
 				JOptionPane.showMessageDialog(this, "Hocam ora yassssssssssak");
 			}
 			else {
 				System.out.println(towercursor.getX());
-				towerHandler.addTower(new SmallTower(towercursor.getX(),towercursor.getY(),Game.TileSize,Game.TileSize,"res/Tank.png"));
-				map_empty[towercursor.getX()/Game.TileSize][towercursor.getY()/Game.TileSize] = true;
+				towerHandler.addTower(tower);
+				map_fill[towercursor.getX()/Game.TileSize][towercursor.getY()/Game.TileSize] = true;
 			}
-			System.out.println(towerHandler.towers.size());
 		}	
 		
 	}
