@@ -6,3 +6,5 @@ Harita Map.txt dosyasından okunuyor.
 Biraz Tile bazlı bir oyun olduğunun havasını verdik.(TowerCursor.java)
 
 Henüz çok başındayım projenin verecek çok bir bilgi yok.
+
+Tam değiştiremedim şimdilik bin dosyası kaldı src ye commit attım.
